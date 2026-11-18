@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=720, height=1280">
+<title>Mur d'écrans</title>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+@font-face{font-family:'Arial Black';src:local('Arial Black')}
+@font-face{font-family:'Segoe UI Black';src:local('Segoe UI Black')}
+@font-face{font-family:'Impact';src:local('Impact')}
+@font-face{font-family:'Segoe UI';src:local('Segoe UI')}
+@font-face{font-family:'Arial';src:local('Arial')}
+@font-face{font-family:'Consolas';src:local('Consolas')}
+@font-face{font-family:'Georgia';src:local('Georgia')}
+@font-face{font-family:'Times New Roman';src:local('Times New Roman')}
+@font-face{font-family:'Segoe Print';src:local('Segoe Print')}
+@font-face{font-family:'Comic Sans MS';src:local('Comic Sans MS')}
+@font-face{font-family:'Segoe UI Symbol';src:local('Segoe UI Symbol')}
+@font-face{font-family:'Segoe Script';src:local('Segoe Script')}
+html,body{margin:0;background:#000}
+#root{position:relative;width:100%;height:100%;overflow:hidden;background:#000}
+.a{position:absolute}
+.vid{position:absolute;left:0;top:0;width:720px;height:1280px;object-fit:cover}
+.heavy{font-family:'Arial Black','Segoe UI Black',Impact,sans-serif}
+.ui{font-family:'Segoe UI',Arial,sans-serif}
+#chip{position:absolute;left:22px;top:22px;padding:6px 16px;border-radius:20px;background:rgba(0,0,0,.6);color:#fff;
+ font:700 22px 'Segoe UI',Arial,sans-serif;z-index:500}
+#bgw{left:0;top:0;width:720px;height:1280px;background:linear-gradient(180deg,#e6d6ba 0%,#cdb591 72%,#8b6b4a 72%,#6f523a 100%)}
+#wall{left:-70px;top:70px;width:960px;height:870px;transform-origin:0 50%;z-index:2}
+.post{position:absolute;width:210px;height:260px;border:10px solid #fff;box-sizing:content-box;box-shadow:0 14px 28px rgba(0,0,0,.35);color:#fff}
+.post .n{font-size:84px;padding:14px 16px 0}
+.post .l1{position:absolute;left:16px;right:16px;bottom:28px;height:10px;background:rgba(255,255,255,.8);border-radius:6px}
+.post .l2{position:absolute;left:16px;width:90px;bottom:52px;height:10px;background:rgba(255,255,255,.55);border-radius:6px}
+</style></head><body>
+<div id="root" data-composition-id="main" data-start="0" data-width="720" data-height="1280" data-duration="5">
+<div id="bgw" class="a"></div>
+<div id="wall" class="a"></div>
+<video id="cut" class="vid" src="cut.webm" muted playsinline data-start="0" data-duration="5" data-track-index="1" style="z-index:3;filter:drop-shadow(0 20px 30px rgba(0,0,0,.45))"></video>
+
+</div>
+<script>
+const W=720,H=1280,FPS=30;
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const io=t=>{t=clamp(t);return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2};
+const eo=t=>1-Math.pow(1-clamp(t),3);
+const lerp=(a,b,t)=>a+(b-a)*t;
+const seg=(t,a,b)=>clamp((t-a)/(b-a));
+const rnd=n=>{const x=Math.sin(n*127.1+311.7)*43758.5453;return x-Math.floor(x)};
+const $=id=>document.getElementById(id);
+function run(draw){const tl=gsap.timeline({paused:true});const P={t:0};
+  tl.to(P,{t:5,duration:5,ease:"none",onUpdate:()=>draw(P.t)},0);draw(0);window.__timelines["main"]=tl;}
+
+const grads=[["#ff7a59","#ffb36b"],["#6c8cff","#9be7ff"],["#2ec4b6","#b8f2e6"],["#b388ff","#f3a8ff"]];
+const posts=[];
+for(let i=0;i<12;i++){const c=i%4,r=Math.floor(i/4),g=grads[(c+r)%4],e=document.createElement("div");
+  e.className="post heavy";e.style.left=c*240+"px";e.style.top=r*290+"px";e.style.background=`linear-gradient(160deg,${g[0]},${g[1]})`;
+  e.innerHTML=`<div class="n">${String(i+1).padStart(2,"0")}</div><div class="l2"></div><div class="l1"></div>`;$("wall").appendChild(e);posts.push(e)}
+run(t=>{
+  $("wall").style.transform=`perspective(1500px) translateX(${-30*t}px) rotateY(-26deg)`;
+  posts.forEach((e,i)=>{const p=eo(seg(t,.2+i*.13,.75+i*.13));e.style.transform=`scale(${.4+.6*p})`;e.style.opacity=p});
+});
+
+</script></body></html>
